@@ -1,0 +1,56 @@
+spring:
+  application:
+    name: PSL-Spotlight-Spring
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/psl_spotlight
+    username: postgres
+    password: Meka2000
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: vumatom10@gmail.com
+    password: pmulooagemwvuvkb
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 5MB
+      max-request-size: 5MB
+
+server:
+  port: 8080
+
+jackson:
+  serialization:
+    WRITE_DATES_AS_TIMESTAMPS: false
+
+jwt:
+  secret: mySuperSecretKey123
+  expiration: 86400000 # 1 day in milliseconds
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: method
+
+# Custom property for frontend URL (used in EmailService)
+client:
+  url: http://localhost:3000
