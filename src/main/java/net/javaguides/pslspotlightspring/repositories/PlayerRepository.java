@@ -6,4 +6,5 @@ import java.util.List;
 
 public interface PlayerRepository extends JpaRepository<Player, Long> {
     List<Player> findByNameContainingIgnoreCaseOrClubContainingIgnoreCase(String nameKeyword, String clubKeyword);
+    List<Player> findTop5ByOrderByTrendingRatingDesc();
 }

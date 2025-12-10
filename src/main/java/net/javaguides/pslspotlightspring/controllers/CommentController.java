@@ -24,31 +24,13 @@ public class CommentController {
                                                     @RequestBody Map<String, String> body,
                                                     @AuthenticationPrincipal UserPrincipal principal) {
         Long userId = principal != null ? principal.getUserId() : null;
-        Comment comment = commentService.createComment(postId, userId, body.get("content"));
-
-        CommentDto dto = new CommentDto(
-                comment.getId(),
-                comment.getContent(),
-                comment.getUser().getUsername(),
-                comment.getCreatedAt()
-        );
-
+        CommentDto dto = commentService.createComment(postId, userId, body.get("content"));
         return ResponseEntity.ok(dto);
     }
 
     @GetMapping("/{postId}")
     public ResponseEntity<List<CommentDto>> getComments(@PathVariable Long postId) {
-        List<Comment> comments = commentService.getCommentsByPost(postId);
-
-        List<CommentDto> dtos = comments.stream()
-                .map(c -> new CommentDto(
-                        c.getId(),
-                        c.getContent(),
-                        c.getUser().getUsername(),
-                        c.getCreatedAt()
-                ))
-                .toList();
-
+        List<CommentDto> dtos = commentService.getCommentsByPost(postId);
         return ResponseEntity.ok(dtos);
     }
 

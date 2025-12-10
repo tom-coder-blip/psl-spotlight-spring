@@ -7,6 +7,7 @@ import net.javaguides.pslspotlightspring.repositories.PostRepository;
 import net.javaguides.pslspotlightspring.repositories.UserRepository;
 import org.springframework.stereotype.Service;
 import java.util.List;
+import net.javaguides.pslspotlightspring.dto.LikeDto;
 
 @Service
 public class LikeService {
@@ -14,18 +15,21 @@ public class LikeService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final TrendingService trendingService;
+    private final NotificationService notificationService;
 
     public LikeService(LikeRepository likeRepository,
                        PostRepository postRepository,
                        UserRepository userRepository,
-                       TrendingService trendingService) {
+                       TrendingService trendingService,
+                       NotificationService notificationService) {
         this.likeRepository = likeRepository;
         this.postRepository = postRepository;
         this.userRepository = userRepository;
         this.trendingService = trendingService;
+        this.notificationService = notificationService;
     }
 
-    public Like likePost(Long postId, Long userId) {
+    public LikeDto likePost(Long postId, Long userId) {
         if (likeRepository.findByPostIdAndUserId(postId, userId).isPresent()) {
             throw new RuntimeException("Already liked this post");
         }
@@ -37,8 +41,18 @@ public class LikeService {
 
         Like like = Like.builder().post(post).user(user).build();
         Like saved = likeRepository.save(like);
+
+        // 🔼 Trending impact
         trendingService.addLikeImpact(post.getPlayer().getId());
-        return saved;
+
+        // 🔔 Notification
+        notificationService.sendNotification(
+                post.getUser().getId(),
+                "LIKE",
+                user.getUsername() + " liked your post"
+        );
+
+        return LikeDto.from(saved);
     }
 
     public void unlikePost(Long postId, Long userId) {
@@ -49,7 +63,10 @@ public class LikeService {
         likeRepository.delete(like);
     }
 
-    public List<Like> getLikesByPost(Long postId) {
-        return likeRepository.findByPostId(postId);
+    public List<LikeDto> getLikesByPost(Long postId) {
+        return likeRepository.findByPostId(postId)
+                .stream()
+                .map(LikeDto::from)
+                .toList();
     }
 }

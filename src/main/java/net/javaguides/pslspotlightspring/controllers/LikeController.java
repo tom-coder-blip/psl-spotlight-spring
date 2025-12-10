@@ -22,14 +22,8 @@ public class LikeController {
     public ResponseEntity<LikeDto> likePost(@PathVariable Long postId,
                                             @AuthenticationPrincipal UserPrincipal principal) {
         Long userId = principal != null ? principal.getUserId() : null;
-        Like like = likeService.likePost(postId, userId);
 
-        LikeDto dto = new LikeDto(
-                like.getId(),
-                like.getUser().getUsername(),
-                like.getCreatedAt()
-        );
-
+        LikeDto dto = likeService.likePost(postId, userId);
         return ResponseEntity.ok(dto);
     }
 
@@ -43,16 +37,7 @@ public class LikeController {
 
     @GetMapping("/{postId}")
     public ResponseEntity<List<LikeDto>> getLikes(@PathVariable Long postId) {
-        List<Like> likes = likeService.getLikesByPost(postId);
-
-        List<LikeDto> dtos = likes.stream()
-                .map(like -> new LikeDto(
-                        like.getId(),
-                        like.getUser().getUsername(),
-                        like.getCreatedAt()
-                ))
-                .toList();
-
+        List<LikeDto> dtos = likeService.getLikesByPost(postId);
         return ResponseEntity.ok(dtos);
     }
 }

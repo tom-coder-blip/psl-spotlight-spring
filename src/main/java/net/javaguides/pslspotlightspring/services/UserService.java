@@ -3,13 +3,17 @@ package net.javaguides.pslspotlightspring.services;
 import net.javaguides.pslspotlightspring.entities.User;
 import net.javaguides.pslspotlightspring.repositories.UserRepository;
 import org.springframework.stereotype.Service;
+import net.javaguides.pslspotlightspring.dto.UserDto;
 
 @Service
 public class UserService {
     private final UserRepository userRepository;
+    private final NotificationService notificationService; // new dependency
 
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository,
+                       NotificationService notificationService) { // inject here
         this.userRepository = userRepository;
+        this.notificationService = notificationService;
     }
 
     public User getUserProfile(Long userId) {
@@ -25,7 +29,7 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public void followUser(Long currentUserId, Long targetUserId) {
+    public UserDto followUser(Long currentUserId, Long targetUserId) {
         if (currentUserId.equals(targetUserId)) {
             throw new RuntimeException("You cannot follow yourself");
         }
@@ -38,6 +42,15 @@ public class UserService {
 
         userRepository.save(currentUser);
         userRepository.save(targetUser);
+
+        // 🔔 Notification
+        notificationService.sendNotification(
+                targetUser.getId(),
+                "FOLLOW",
+                currentUser.getUsername() + " started following you"
+        );
+
+        return UserDto.from(targetUser);
     }
 
     public void unfollowUser(Long currentUserId, Long targetUserId) {

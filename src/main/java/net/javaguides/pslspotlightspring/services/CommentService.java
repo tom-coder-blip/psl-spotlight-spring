@@ -8,6 +8,7 @@ import net.javaguides.pslspotlightspring.repositories.PostRepository;
 import net.javaguides.pslspotlightspring.repositories.UserRepository;
 import org.springframework.stereotype.Service;
 import java.util.List;
+import net.javaguides.pslspotlightspring.dto.CommentDto;
 
 @Service
 public class CommentService {
@@ -15,18 +16,21 @@ public class CommentService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final TrendingService trendingService;
+    private final NotificationService notificationService; // NEW
 
     public CommentService(CommentRepository commentRepository,
                           PostRepository postRepository,
                           UserRepository userRepository,
-                          TrendingService trendingService) {
+                          TrendingService trendingService,
+                          NotificationService notificationService) { // NEW
         this.commentRepository = commentRepository;
         this.postRepository = postRepository;
         this.userRepository = userRepository;
         this.trendingService = trendingService;
+        this.notificationService = notificationService; // NEW
     }
 
-    public Comment createComment(Long postId, Long userId, String content) {
+    public CommentDto createComment(Long postId, Long userId, String content) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new RuntimeException("Post not found"));
         User user = userRepository.findById(userId)
@@ -39,12 +43,25 @@ public class CommentService {
                 .build();
 
         Comment saved = commentRepository.save(comment);
+
+        // 🔼 Trending impact
         trendingService.addCommentImpact(post.getPlayer().getId());
-        return saved;
+
+        // 🔔 Notification
+        notificationService.sendNotification(
+                post.getUser().getId(),
+                "COMMENT",
+                user.getUsername() + " commented on your post"
+        );
+
+        return CommentDto.from(saved);
     }
 
-    public List<Comment> getCommentsByPost(Long postId) {
-        return commentRepository.findByPostIdOrderByCreatedAtDesc(postId);
+    public List<CommentDto> getCommentsByPost(Long postId) {
+        return commentRepository.findByPostIdOrderByCreatedAtDesc(postId)
+                .stream()
+                .map(CommentDto::from)
+                .toList();
     }
 
     public void deleteComment(Long commentId, Long userId) {
