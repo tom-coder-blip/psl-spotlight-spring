@@ -13,14 +13,19 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.io.IOException;
 import java.util.List;
+import net.javaguides.pslspotlightspring.entities.Post;
+import net.javaguides.pslspotlightspring.dto.PostDto;
+import net.javaguides.pslspotlightspring.repositories.PostRepository;
 
 @RestController
 @RequestMapping("/users")
 public class UserController {
     private final UserService userService;
+    private final PostRepository postRepository;
 
-    public UserController(UserService userService) {
+    public UserController(UserService userService, PostRepository postRepository) {
         this.userService = userService;
+        this.postRepository = postRepository;
     }
 
     @GetMapping("/{id}")
@@ -85,4 +90,20 @@ public class UserController {
                 .toList();
         return ResponseEntity.ok(following);
     }
+
+    @GetMapping("/{id}/posts")
+    public ResponseEntity<List<PostDto>> getUserPosts(@PathVariable Long id) {
+        List<Post> posts = postRepository.findByUser_IdOrderByCreatedAtDesc(id);
+        List<PostDto> dtos = posts.stream()
+                .map(PostDto::from)
+                .toList();
+        return ResponseEntity.ok(dtos);
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<UserDto> getCurrentUser(@RequestAttribute("userId") Long userId) {
+        User user = userService.getUserProfile(userId);
+        return ResponseEntity.ok(UserDto.from(user));
+    }
+
 }

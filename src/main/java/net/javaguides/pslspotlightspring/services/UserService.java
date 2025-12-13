@@ -63,4 +63,8 @@ public class UserService {
         userRepository.save(currentUser);
         userRepository.save(targetUser);
     }
+
+    public User getCurrentUser(Long id) {
+        return userRepository.findById(id).orElseThrow();
+    }
 }

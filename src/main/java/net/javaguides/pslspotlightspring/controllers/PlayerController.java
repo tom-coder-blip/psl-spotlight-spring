@@ -70,9 +70,50 @@ public class PlayerController {
         return ResponseEntity.ok(playerService.getPlayerById(id));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Player> updatePlayerStats(@PathVariable Long id, @RequestBody Player updated) {
-        return ResponseEntity.ok(playerService.updatePlayerStats(id, updated));
+    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> updatePlayerWithPicture(
+            @PathVariable Long id,
+            @RequestParam("name") String name,
+            @RequestParam("club") String club,
+            @RequestParam("position") String position,
+            @RequestParam(value = "goals", required = false) Integer goals,
+            @RequestParam(value = "assists", required = false) Integer assists,
+            @RequestParam(value = "appearances", required = false) Integer appearances,
+            @RequestParam(value = "trendingRating", required = false) Double trendingRating,
+            @RequestParam(value = "playerPicture", required = false) MultipartFile playerPicture
+    ) {
+        try {
+            String filename = null;
+
+            if (playerPicture != null && !playerPicture.isEmpty()) {
+                filename = System.currentTimeMillis() + "_" + playerPicture.getOriginalFilename();
+
+                Path uploadDir = Paths.get("uploads");
+                if (!Files.exists(uploadDir)) {
+                    Files.createDirectories(uploadDir);
+                }
+
+                Path path = uploadDir.resolve(filename);
+                Files.copy(playerPicture.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
+            }
+
+            Player updated = Player.builder()
+                    .name(name)
+                    .club(club)
+                    .position(position)
+                    .goals(goals)
+                    .assists(assists)
+                    .appearances(appearances)
+                    .trendingRating(trendingRating)
+                    .playerPicture(filename)
+                    .build();
+
+            Player saved = playerService.updatePlayerStats(id, updated);
+            return ResponseEntity.ok(saved);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Update failed: " + e.getMessage());
+        }
     }
 
     @DeleteMapping("/{id}")

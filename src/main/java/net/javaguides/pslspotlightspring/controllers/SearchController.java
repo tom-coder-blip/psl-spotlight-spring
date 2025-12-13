@@ -9,6 +9,9 @@ import net.javaguides.pslspotlightspring.repositories.UserRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import net.javaguides.pslspotlightspring.dto.UserDto;
+import net.javaguides.pslspotlightspring.dto.PlayerDto;
+import net.javaguides.pslspotlightspring.dto.PostDto;
 
 @RestController
 @RequestMapping("/search")
@@ -24,20 +27,48 @@ public class SearchController {
     }
 
     @GetMapping("/players")
-    public ResponseEntity<List<Player>> searchPlayers(@RequestParam String keyword) {
+    public ResponseEntity<List<PlayerDto>> searchPlayers(@RequestParam String keyword) {
         List<Player> results = playerRepository.findByNameContainingIgnoreCaseOrClubContainingIgnoreCase(keyword, keyword);
-        return ResponseEntity.ok(results);
+        List<PlayerDto> dtos = results.stream()
+                .map(p -> new PlayerDto(
+                        p.getId(),
+                        p.getName(),
+                        p.getClub(),
+                        p.getPosition(),
+                        p.getPlayerPicture(),
+                        p.getGoals(),
+                        p.getAssists(),
+                        p.getAppearances(),
+                        p.getTrendingRating(),
+                        p.getCreatedAt()
+                ))
+                .toList();
+        return ResponseEntity.ok(dtos);
     }
 
     @GetMapping("/posts")
-    public ResponseEntity<List<Post>> searchPosts(@RequestParam String keyword) {
+    public ResponseEntity<List<PostDto>> searchPosts(@RequestParam String keyword) {
         List<Post> results = postRepository.findByTitleContainingIgnoreCaseOrTagsContainingIgnoreCase(keyword, keyword);
-        return ResponseEntity.ok(results);
+        List<PostDto> dtos = results.stream().map(post -> new PostDto(
+                post.getId(),
+                post.getPlayerName(),
+                post.getClub(),
+                post.getMatchweek(),
+                post.getTitle(),
+                post.getContent(),
+                post.getImage(),
+                post.getUser().getUsername(),
+                post.getTags(),
+                post.getLikes().size(),
+                post.getCreatedAt()
+        )).toList();
+        return ResponseEntity.ok(dtos);
     }
 
     @GetMapping("/users")
-    public ResponseEntity<List<User>> searchUsers(@RequestParam String keyword) {
+    public ResponseEntity<List<UserDto>> searchUsers(@RequestParam String keyword) {
         List<User> results = userRepository.findByUsernameContainingIgnoreCaseOrTeamSupportedContainingIgnoreCase(keyword, keyword);
-        return ResponseEntity.ok(results);
+        List<UserDto> dtos = results.stream().map(UserDto::from).toList();
+        return ResponseEntity.ok(dtos);
     }
 }

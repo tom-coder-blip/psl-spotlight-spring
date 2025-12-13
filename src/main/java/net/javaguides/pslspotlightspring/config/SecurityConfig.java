@@ -39,18 +39,29 @@ public class SecurityConfig {
         return http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                        .requestMatchers(
+                                "/auth/**",
+                                "/swagger-ui.html",   // main UI page
+                                "/swagger-ui/**",     // JS/CSS assets
+                                "/v3/api-docs",       // OpenAPI spec root
+                                "/v3/api-docs/**",    // subpaths
+                                "/api-docs/**"        // optional alias
+                        ).permitAll()
                         .requestMatchers(HttpMethod.GET, "/players/**").permitAll() // anyone can view
                         .requestMatchers(HttpMethod.POST, "/players/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/players/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/players/**").hasRole("ADMIN")
-                        .requestMatchers("/posts/**").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/posts/**").permitAll() // ✅ allow public access
                         .requestMatchers(HttpMethod.POST, "/comments/**").authenticated()
                         .requestMatchers(HttpMethod.DELETE, "/comments/**").authenticated()
                         .requestMatchers(HttpMethod.GET, "/comments/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/likes/**").authenticated()
                         .requestMatchers(HttpMethod.DELETE, "/likes/**").authenticated()
                         .requestMatchers(HttpMethod.GET, "/likes/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/notifications/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/users/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/search/**").permitAll()
+                        .requestMatchers("/uploads/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)

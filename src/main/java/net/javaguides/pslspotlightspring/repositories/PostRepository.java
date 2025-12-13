@@ -10,6 +10,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     List<Post> findByMatchweek(int matchweek);
     List<Post> findByPlayerName(String playerName);
     List<Post> findByTitleContainingIgnoreCaseOrTagsContainingIgnoreCase(String titleKeyword, String tagKeyword);
+    List<Post> findByUser_IdOrderByCreatedAtDesc(Long userId);
 
     @Query("SELECT p FROM Post p ORDER BY SIZE(p.likes) DESC")
     List<Post> findTop5ByOrderByLikesDesc();

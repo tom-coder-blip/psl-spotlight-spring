@@ -1,6 +1,5 @@
 package net.javaguides.pslspotlightspring.repositories;
 
-import net.javaguides.pslspotlightspring.entities.Player;
 import net.javaguides.pslspotlightspring.entities.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 

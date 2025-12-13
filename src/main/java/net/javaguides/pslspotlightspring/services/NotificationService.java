@@ -38,10 +38,9 @@ public class NotificationService {
                 .toList();
     }
 
-    public void markAsRead(Long notificationId) {
-        Notification notification = notificationRepository.findById(notificationId)
-                .orElseThrow(() -> new RuntimeException("Notification not found"));
-        notification.setRead(true);
-        notificationRepository.save(notification);
+    public void markAllAsRead(Long userId) {
+        List<Notification> notifications = notificationRepository.findByRecipientIdOrderByCreatedAtDesc(userId);
+        notifications.forEach(n -> n.setRead(true));
+        notificationRepository.saveAll(notifications);
     }
 }

@@ -87,8 +87,22 @@ public class PostController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Post>> getPosts(@RequestParam(required = false) Integer week) {
-        return ResponseEntity.ok(postService.getPosts(week));
+    public ResponseEntity<List<PostDto>> getPosts(@RequestParam(required = false) Integer week) {
+        List<Post> posts = postService.getPosts(week);
+        List<PostDto> dtos = posts.stream().map(post -> new PostDto(
+                post.getId(),
+                post.getPlayerName(),
+                post.getClub(),
+                post.getMatchweek(),
+                post.getTitle(),
+                post.getContent(),
+                post.getImage(),
+                post.getUser().getUsername(),
+                post.getTags(),
+                post.getLikes().size(),
+                post.getCreatedAt()
+        )).toList();
+        return ResponseEntity.ok(dtos);
     }
 
     @GetMapping("/{id}")

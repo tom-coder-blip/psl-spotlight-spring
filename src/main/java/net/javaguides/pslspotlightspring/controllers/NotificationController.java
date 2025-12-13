@@ -1,6 +1,5 @@
 package net.javaguides.pslspotlightspring.controllers;
 
-import net.javaguides.pslspotlightspring.entities.Notification;
 import net.javaguides.pslspotlightspring.services.NotificationService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,9 +20,9 @@ public class NotificationController {
         return ResponseEntity.ok(notificationService.getUserNotifications(userId));
     }
 
-    @PostMapping("/{id}/read")
-    public ResponseEntity<?> markAsRead(@PathVariable Long id) {
-        notificationService.markAsRead(id);
-        return ResponseEntity.ok("Marked as read");
+    @PutMapping("/read")
+    public ResponseEntity<?> markAllAsRead(@RequestAttribute("userId") Long userId) {
+        notificationService.markAllAsRead(userId);
+        return ResponseEntity.ok("All notifications marked as read");
     }
 }

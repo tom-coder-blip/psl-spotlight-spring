@@ -3,7 +3,7 @@ spring:
     name: PSL-Spotlight-Spring
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/psl_spotlight
+    url: jdbc:postgresql://host.docker.internal:5432/psl_spotlight
     username: postgres
     password: Meka2000
 
