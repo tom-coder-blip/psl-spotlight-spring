@@ -3,9 +3,9 @@ spring:
     name: PSL-Spotlight-Spring
 
   datasource:
-    url: jdbc:postgresql://host.docker.internal:5432/psl_spotlight
-    username: postgres
-    password: Meka2000
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
 
   jpa:
     hibernate:

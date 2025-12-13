@@ -30,28 +30,24 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
-        return config.getAuthenticationManager();
-    }
-
-    @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/auth/**",
-                                "/swagger-ui.html",   // main UI page
-                                "/swagger-ui/**",     // JS/CSS assets
-                                "/v3/api-docs",       // OpenAPI spec root
-                                "/v3/api-docs/**",    // subpaths
-                                "/api-docs/**"        // optional alias
+                                "/swagger-ui.html",
+                                "/swagger-ui/**",
+                                "/v3/api-docs",
+                                "/v3/api-docs/**",
+                                "/api-docs/**",
+                                "/uploads/**"
                         ).permitAll()
-                        .requestMatchers(HttpMethod.GET, "/players/**").permitAll() // anyone can view
+                        .requestMatchers(HttpMethod.GET, "/players/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/players/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/players/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/players/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/posts/**").permitAll() // ✅ allow public access
+                        .requestMatchers(HttpMethod.GET, "/posts/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/comments/**").authenticated()
                         .requestMatchers(HttpMethod.DELETE, "/comments/**").authenticated()
                         .requestMatchers(HttpMethod.GET, "/comments/**").permitAll()
@@ -61,7 +57,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/notifications/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/users/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/search/**").permitAll()
-                        .requestMatchers("/uploads/**").permitAll()
+                        // finally, catch-all
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
