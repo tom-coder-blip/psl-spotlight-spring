@@ -18,8 +18,8 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username: vumatom10@gmail.com
-    password: pmulooagemwvuvkb
+    username: ${SPRING_MAIL_PASSWORD}
+    password: ${SPRING_MAIL_PASSWORD}
     properties:
       mail:
         smtp:
@@ -41,7 +41,7 @@ jackson:
     WRITE_DATES_AS_TIMESTAMPS: false
 
 jwt:
-  secret: mySuperSecretKey123
+  secret: ${JWT_SECRET}
   expiration: 86400000 # 1 day in milliseconds
 
 springdoc:
@@ -53,4 +53,4 @@ springdoc:
 
 # Custom property for frontend URL (used in EmailService)
 client:
-  url: http://localhost:3000
+  url: ${CLIENT_URL}
