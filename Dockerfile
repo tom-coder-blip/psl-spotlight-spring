@@ -7,6 +7,9 @@ WORKDIR /app
 # Copy Maven wrapper and project files
 COPY . .
 
+# Make Maven wrapper executable
+RUN chmod +x mvnw
+
 # Package the app
 RUN ./mvnw clean package -DskipTests
 
