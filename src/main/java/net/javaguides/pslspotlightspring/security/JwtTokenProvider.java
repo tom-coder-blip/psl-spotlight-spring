@@ -4,6 +4,7 @@ import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import jakarta.annotation.PostConstruct;
 
 import java.security.Key;
 import java.util.Date;
@@ -11,12 +12,19 @@ import java.util.Date;
 @Component
 public class JwtTokenProvider {
 
-    // expiration still comes from application.yml
+    @Value("${jwt.secret}")
+    private String jwtSecret;
+
     @Value("${jwt.expiration}")
     private long jwtExpiration;
 
-    // generate a strong 512-bit key automatically
-    private final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS512);
+    private Key key;
+
+    @PostConstruct
+    public void init() {
+        // derive a stable key from your secret
+        this.key = Keys.hmacShaKeyFor(jwtSecret.getBytes());
+    }
 
     public String generateToken(Long userId, String role) {
         Date now = new Date();
@@ -24,7 +32,7 @@ public class JwtTokenProvider {
 
         return Jwts.builder()
                 .setSubject(Long.toString(userId))
-                .claim("role", role) // add role claim
+                .claim("role", role)
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)
                 .signWith(key, SignatureAlgorithm.HS512)
@@ -37,7 +45,6 @@ public class JwtTokenProvider {
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
-
         return claims.get("role", String.class);
     }
 
@@ -47,7 +54,6 @@ public class JwtTokenProvider {
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
-
         return Long.parseLong(claims.getSubject());
     }
 
