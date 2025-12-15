@@ -43,6 +43,7 @@ public class SecurityConfig {
                                 "/api-docs/**",
                                 "/uploads/**"
                         ).permitAll()
+                        .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
                         .requestMatchers(HttpMethod.GET, "/players/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/players/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/players/**").hasRole("ADMIN")
