@@ -31,12 +31,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String path = request.getRequestURI();
 
-        // Skip filtering for public endpoints
+        // Skip filtering and clear context for public endpoints
         if (path.startsWith("/auth") ||
                 path.startsWith("/swagger-ui") ||
                 path.startsWith("/v3/api-docs") ||
                 path.startsWith("/api-docs") ||
                 path.startsWith("/uploads")) {
+            SecurityContextHolder.clearContext(); // ensures no stale or invalid auth
             filterChain.doFilter(request, response);
             return;
         }
