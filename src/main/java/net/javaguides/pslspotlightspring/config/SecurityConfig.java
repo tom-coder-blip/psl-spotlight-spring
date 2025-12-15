@@ -3,14 +3,10 @@ package net.javaguides.pslspotlightspring.config;
 import net.javaguides.pslspotlightspring.security.JwtTokenProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import net.javaguides.pslspotlightspring.security.JwtAuthenticationFilter;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.http.HttpMethod;
 
 @Configuration
 public class SecurityConfig {
@@ -30,35 +26,23 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(org.springframework.security.config.annotation.web.builders.HttpSecurity http) throws Exception {
         return http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/auth/**",
-                                "/swagger-ui.html",
-                                "/swagger-ui/**",
-                                "/v3/api-docs",
-                                "/v3/api-docs/**",
-                                "/api-docs/**",
-                                "/uploads/**"
-                        ).permitAll()
-                        .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/players/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/players/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/players/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/players/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/posts/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/comments/**").authenticated()
-                        .requestMatchers(HttpMethod.DELETE, "/comments/**").authenticated()
-                        .requestMatchers(HttpMethod.GET, "/comments/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/likes/**").authenticated()
-                        .requestMatchers(HttpMethod.DELETE, "/likes/**").authenticated()
-                        .requestMatchers(HttpMethod.GET, "/likes/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/notifications/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/users/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/search/**").permitAll()
-                        // finally, catch-all
+                        // Public endpoints
+                        .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/swagger-ui.html", "/swagger-ui/**").permitAll()
+                        .requestMatchers("/v3/api-docs/**", "/api-docs/**").permitAll()
+                        .requestMatchers("/uploads/**").permitAll()
+                        .requestMatchers("/players/**").permitAll()
+                        .requestMatchers("/posts/**").permitAll()
+                        .requestMatchers("/comments/**").permitAll()
+                        .requestMatchers("/likes/**").permitAll()
+                        .requestMatchers("/notifications/**").permitAll()
+                        .requestMatchers("/users/**").permitAll()
+                        .requestMatchers("/search/**").permitAll()
+                        // Everything else requires authentication
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
