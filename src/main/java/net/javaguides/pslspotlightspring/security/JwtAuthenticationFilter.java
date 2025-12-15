@@ -36,8 +36,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 path.startsWith("/swagger-ui") ||
                 path.startsWith("/v3/api-docs") ||
                 path.startsWith("/api-docs") ||
-                path.startsWith("/uploads")) {
-            SecurityContextHolder.clearContext(); // ensures no stale or invalid auth
+                path.startsWith("/uploads") ||
+                path.startsWith("/posts") ||
+                path.startsWith("/comments") ||
+                path.startsWith("/likes") ||
+                path.startsWith("/notifications") ||
+                path.startsWith("/users") ||
+                path.startsWith("/search")) {
+            SecurityContextHolder.clearContext(); // ignore any Authorization header
             filterChain.doFilter(request, response);
             return;
         }
